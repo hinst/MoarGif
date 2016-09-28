@@ -71,14 +71,16 @@ const processPageRequest = function(request, response) {
 };
 const processConvertRequest = function(request, response, next) {
 	var output = execFileSync(imageMagickPath,
-		['convert', '-colors', '2', '-type', 'optimize', '-', 'GIF:-'],
+		['convert', '-colors', '3', '-type', 'optimize', '-', 'GIF:-'],
 		{
 			input: request.file.buffer,
 			encoding: "buffer"
 		}
 	);
 	//fileSystem.writeFileSync('temp.gif', output);
-	response.send(output.toString("base64"));
+	let content = loadPage("delivery");
+	content = content.replace("$imageData", output.toString("base64"))
+	response.send(content);
 };
 app.get(appURL, processPageRequest);
 app.post(appURL + "/convertImage", uploader.single("file"), processConvertRequest);

@@ -10,7 +10,6 @@ const app = express();
 const portNumber = 9001;
 const latinAlphabetLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const imageMagickPath = "C:\\Program Files\\ImageMagick-7.0.3-Q16\\magick.exe";
-app.listen(portNumber);
 const loadLayoutString = function() {
 	return fileSystem.readFileSync(__dirname + "/page/layout.html", "utf8");
 };
@@ -70,16 +69,16 @@ const processPageRequest = function(request, response) {
 	const content = loadPage(pageName);
 	response.send(content);
 };
-const processConvertRequest = function(request, response, next) {
+const processConvertRequest = function(request, response) {
 	var options = ['convert'];
 	if (request.body.colorRadio != 0 && request.body.colorRadio != undefined) {
 		options.push('-colors');
 		options.push('' + request.body.colorRadio);
 	}
 	options.push('-type'); options.push('optimize');
+	options.push('-resize'); options.push('640x640>');
 	options.push('-');
 	options.push('GIF:-');
-	console.log(request.body.colorRadio);
 	if (request.file != undefined) {
 		var output = execFileSync(imageMagickPath,
 			options,
@@ -94,9 +93,10 @@ const processConvertRequest = function(request, response, next) {
 		response.send(content);
 	}
 };
+app.use(bodyParser.urlencoded());
 app.get(appURL, processPageRequest);
 app.post(appURL + "/convertImage", uploader.single("file"), processConvertRequest);
 app.use(appURL + "/third", express.static("third"));
 app.use(appURL + "/page", express.static("page"));
-app.use(bodyParser.urlencoded());
+app.listen(portNumber);
 console.log("app initialized");

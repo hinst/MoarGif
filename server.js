@@ -86,12 +86,12 @@ const processConvertRequest = function(request, response) {
 	let options = [];
 	if (config.windowsMode)
 		options.push('convert');
+	options.push('-resize'); options.push('640x640>');
 	if (request.body.colorRadio != 0 && request.body.colorRadio != undefined) {
 		options.push('-colors');
 		options.push('' + request.body.colorRadio);
 	}
 	options.push('-type'); options.push('optimize');
-	options.push('-resize'); options.push('640x640>');
 	options.push('-');
 	options.push('GIF:-');
 	if (request.file != undefined) {

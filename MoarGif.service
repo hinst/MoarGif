@@ -1,0 +1,11 @@
+[Unit]
+Description=MoarGif
+
+[Service]
+User=pi
+ExecStart=/home/pi/App/node-v4.6.0-linux-armv6l/bin/node /home/pi/App/
+Restart=on-failure
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

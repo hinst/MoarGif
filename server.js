@@ -5,11 +5,12 @@ const multer = require("multer");
 const execFileSync = require('child_process').execFileSync;
 const bodyParser = require("body-parser");
 const uploader = multer({ inMemory: true });
+const config = JSON.parse(fileSystem.readFileSync('config.json', 'utf8'));
 const appURL = "/MoarGif";
 const app = express();
-const portNumber = 9001;
+const portNumber = config.port;
 const latinAlphabetLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const imageMagickPath = "C:\\Program Files\\ImageMagick-7.0.3-Q16\\magick.exe";
+const imageMagickPath = config.imageMagickPath;
 const loadLayoutString = function() {
 	return fileSystem.readFileSync(__dirname + "/page/layout.html", "utf8");
 };
@@ -93,7 +94,7 @@ const processConvertRequest = function(request, response) {
 		response.send(content);
 	}
 };
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({extended: true}));
 app.get(appURL, processPageRequest);
 app.post(appURL + "/convertImage", uploader.single("file"), processConvertRequest);
 app.use(appURL + "/third", express.static("third"));

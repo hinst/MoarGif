@@ -1,10 +1,11 @@
 "use strict";
 const fileSystem = require("fs");
+const express = require("express");
 const multer = require("multer");
 const execFileSync = require('child_process').execFileSync;
+const bodyParser = require("body-parser");
 const uploader = multer({ inMemory: true });
 const appURL = "/MoarGif";
-const express = require("express");
 const app = express();
 const portNumber = 9001;
 const latinAlphabetLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -70,20 +71,32 @@ const processPageRequest = function(request, response) {
 	response.send(content);
 };
 const processConvertRequest = function(request, response, next) {
-	var output = execFileSync(imageMagickPath,
-		['convert', '-colors', '3', '-type', 'optimize', '-', 'GIF:-'],
-		{
-			input: request.file.buffer,
-			encoding: "buffer"
-		}
-	);
-	//fileSystem.writeFileSync('temp.gif', output);
-	let content = loadPage("delivery");
-	content = content.replace("$imageData", output.toString("base64"))
-	response.send(content);
+	var options = ['convert'];
+	if (request.body.colorRadio != 0 && request.body.colorRadio != undefined) {
+		options.push('-colors');
+		options.push('' + request.body.colorRadio);
+	}
+	options.push('-type'); options.push('optimize');
+	options.push('-');
+	options.push('GIF:-');
+	console.log(request.body.colorRadio);
+	if (request.file != undefined) {
+		var output = execFileSync(imageMagickPath,
+			options,
+			{
+				input: request.file.buffer,
+				encoding: "buffer"
+			}
+		);
+		//fileSystem.writeFileSync('temp.gif', output);
+		let content = loadPage("delivery");
+		content = content.replace("$imageData", output.toString("base64"))
+		response.send(content);
+	}
 };
 app.get(appURL, processPageRequest);
 app.post(appURL + "/convertImage", uploader.single("file"), processConvertRequest);
 app.use(appURL + "/third", express.static("third"));
 app.use(appURL + "/page", express.static("page"));
+app.use(bodyParser.urlencoded());
 console.log("app initialized");

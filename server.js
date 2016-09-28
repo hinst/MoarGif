@@ -1,12 +1,14 @@
 "use strict";
 const fileSystem = require("fs");
 const multer = require("multer");
+const execFileSync = require('child_process').execFileSync;
 const uploader = multer({ inMemory: true });
 const appURL = "/MoarGif";
 const express = require("express");
 const app = express();
 const portNumber = 9001;
 const latinAlphabetLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const imageMagickPath = "C:\\Program Files\\ImageMagick-7.0.3-Q16\\magick.exe";
 app.listen(portNumber);
 const loadLayoutString = function() {
 	return fileSystem.readFileSync(__dirname + "/page/layout.html", "utf8");
@@ -59,7 +61,7 @@ const loadPage = function(pageName) {
 	}
 	return result;
 };
-const pageHandler = function(request, response) {
+const processPageRequest = function(request, response) {
 	let pageName = request.query.page;
 	if (pageName == undefined) {
 		pageName = "main";
@@ -67,11 +69,19 @@ const pageHandler = function(request, response) {
 	const content = loadPage(pageName);
 	response.send(content);
 };
-const convertHandler = function(request, response, next) {
-	console.log(request.file);
+const processConvertRequest = function(request, response, next) {
+	var output = execFileSync(imageMagickPath,
+		['convert', '-colors', '2', '-type', 'optimize', '-', 'GIF:-'],
+		{
+			input: request.file.buffer,
+			encoding: "buffer"
+		}
+	);
+	//fileSystem.writeFileSync('temp.gif', output);
+	response.send(output.toString("base64"));
 };
-app.get(appURL, pageHandler);
-app.post(appURL + "/convertImage", uploader.single("file"), convertHandler);
+app.get(appURL, processPageRequest);
+app.post(appURL + "/convertImage", uploader.single("file"), processConvertRequest);
 app.use(appURL + "/third", express.static("third"));
 app.use(appURL + "/page", express.static("page"));
 console.log("app initialized");

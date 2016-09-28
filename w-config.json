@@ -1,0 +1,5 @@
+{
+	"port": 9001,
+	"imageMagickPath": "C:\\Program Files\\ImageMagick-7.0.3-Q16\\magick.exe",
+	"windowsMode": true
+}

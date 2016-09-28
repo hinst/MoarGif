@@ -5,7 +5,8 @@ const multer = require("multer");
 const execFileSync = require('child_process').execFileSync;
 const bodyParser = require("body-parser");
 const uploader = multer({ inMemory: true });
-const config = JSON.parse(fileSystem.readFileSync('config.json', 'utf8'));
+const configFileName = process.argv["config"];
+const config = JSON.parse(fileSystem.readFileSync(configFileName, 'utf8'));
 const appURL = "/MoarGif";
 const app = express();
 const portNumber = config.port;
@@ -71,7 +72,9 @@ const processPageRequest = function(request, response) {
 	response.send(content);
 };
 const processConvertRequest = function(request, response) {
-	var options = ['convert'];
+	let options = [];
+	if (config.windowsMode)
+		options.push('convert');
 	if (request.body.colorRadio != 0 && request.body.colorRadio != undefined) {
 		options.push('-colors');
 		options.push('' + request.body.colorRadio);

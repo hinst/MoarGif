@@ -1,5 +1,7 @@
 "use strict";
 const fileSystem = require("fs");
+const multer = require("multer");
+const uploader = multer({ inMemory: true });
 const appURL = "/MoarGif";
 const express = require("express");
 const app = express();
@@ -45,7 +47,6 @@ const loadPageString = function(pageName) {
 	return content;
 };
 const substituteTemplate = function(text) {
-	console.log(text);
 	return text.replaceAll("$appURL", appURL);
 }
 const loadPage = function(pageName) {
@@ -66,7 +67,11 @@ const pageHandler = function(request, response) {
 	const content = loadPage(pageName);
 	response.send(content);
 };
+const convertHandler = function(request, response, next) {
+	console.log(request.file);
+};
 app.get(appURL, pageHandler);
+app.post(appURL + "/convertImage", uploader.single("file"), convertHandler);
 app.use(appURL + "/third", express.static("third"));
 app.use(appURL + "/page", express.static("page"));
 console.log("app initialized");

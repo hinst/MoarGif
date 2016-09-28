@@ -1,4 +1,16 @@
 <form action="$appURL/convertImage" class="w3-border w3-panel" method="POST" enctype="multipart/form-data">
 	<p><input name="file" type="file"></p>
+	<div class="w3-panel w3-leftbar w3-light-grey" style="margin-bottom: 0 !important">
+		Color<br>
+	</div>
+	<div class="w3-panel w3-leftbar" style="margin-top: 0 !important">
+		<input type="radio" name="colorRadio" value="0"> Default <br>
+		<input type="radio" name="colorRadio" value="4"> 4 <br>
+		<input type="radio" name="colorRadio" value="8"> 8 <br>
+		<input type="radio" name="colorRadio" value="16"> 16 <br>
+		<input type="radio" name="colorRadio" value="32"> 32 <br>
+		<input type="radio" name="colorRadio" value="64"> 64 <br>
+		<input type="radio" name="colorRadio" value="128"> 128 <br>
+	</div>
 	<p><input type="submit" class="w3-btn w3-light-grey"></p>
 </form>

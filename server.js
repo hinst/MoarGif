@@ -5,9 +5,20 @@ const multer = require("multer");
 const execFileSync = require('child_process').execFileSync;
 const bodyParser = require("body-parser");
 const uploader = multer({ inMemory: true });
-const configFileName = process.argv["config"];
-const config = JSON.parse(fileSystem.readFileSync(configFileName, 'utf8'));
 const appURL = "/MoarGif";
+const loadConfigFileName = function() {
+	let result = null;
+	const configPrefix = "config=";
+	for (let i = 0; i < process.argv.length; i++) {
+		var arg = process.argv[i];
+		if (arg.startsWith(configPrefix)) {
+			return arg.slice(configPrefix.length);
+		}
+	};
+	return result;
+};
+const configFileName = loadConfigFileName();
+const config = JSON.parse(fileSystem.readFileSync(__dirname + "/" + configFileName, 'utf8'));
 const app = express();
 const portNumber = config.port;
 const latinAlphabetLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -100,7 +111,7 @@ const processConvertRequest = function(request, response) {
 app.use(bodyParser.urlencoded({extended: true}));
 app.get(appURL, processPageRequest);
 app.post(appURL + "/convertImage", uploader.single("file"), processConvertRequest);
-app.use(appURL + "/third", express.static("third"));
-app.use(appURL + "/page", express.static("page"));
+app.use(appURL + "/third", express.static(__dirname + "/third"));
+app.use(appURL + "/page", express.static(__dirname + "/page"));
 app.listen(portNumber);
 console.log("app initialized");

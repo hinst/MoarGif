@@ -3,7 +3,7 @@ Description=MoarGif
 
 [Service]
 User=pi
-ExecStart=/home/pi/App/node-v4.6.0-linux-armv6l/bin/node /home/pi/App/
+ExecStart=/home/pi/App/node-v4.6.0-linux-armv6l/bin/node /home/pi/App/MoarGif/server.js config=rpi-config.json
 Restart=on-failure
 KillSignal=SIGINT
 
